@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+# Decrypt secrets and render templates into private/.
+# Called by edit-secrets and usable standalone.
+set -euo pipefail
+
+BASEDIR="${DOTBOT_AGE_BASEDIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)}"
+ENCRYPTED_DIR="$BASEDIR/encrypted"
+PRIVATE_DIR="$BASEDIR/private"
+IDENTITY="$ENCRYPTED_DIR/age.key"
+SECRETS="$ENCRYPTED_DIR/secrets.env.age"
+
+[[ -f "$IDENTITY" ]] || { echo "ERROR: age identity not found at $IDENTITY"; exit 1; }
+[[ -f "$SECRETS" ]]  || { echo "ERROR: encrypted secrets not found at $SECRETS"; exit 1; }
+
+decrypted="$(age -d -i "$IDENTITY" "$SECRETS")"
+
+for src in "$ENCRYPTED_DIR"/*/*; do
+  [[ -f "$src" ]] || continue
+
+  content="$(cat "$src")"
+  while IFS='=' read -r key value; do
+    [[ -z "$key" || "$key" =~ ^# ]] && continue
+    content="${content//\{\{${key}\}\}/${value}}"
+  done <<< "$decrypted"
+
+  relative="${src#$ENCRYPTED_DIR/}"
+  dest="$PRIVATE_DIR/$relative"
+
+  # Skip if unchanged
+  if [[ -f "$dest" ]] && [[ "$(cat "$dest")" == "$content" ]]; then
+    echo "  Unchanged $relative"
+    continue
+  fi
+
+  mkdir -p "$(dirname "$dest")"
+  printf '%s\n' "$content" > "$dest"
+  echo "  Rendered $relative"
+done
+
+find "$PRIVATE_DIR" -type d -exec chmod 700 {} \;
+find "$PRIVATE_DIR" -type f -exec chmod 600 {} \;
