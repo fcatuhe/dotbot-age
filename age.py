@@ -42,7 +42,7 @@ class Age(dotbot.Plugin):
         base = self._context.base_directory()
 
         # Read config or use conventions
-        if data is None:
+        if not isinstance(data, dict):
             data = {}
 
         key = os.path.join(base, data.get("key", self._default_key))
