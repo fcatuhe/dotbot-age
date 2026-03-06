@@ -25,30 +25,9 @@ brew install age
 apt install age  # or see https://github.com/FiloSottile/age#installation
 ```
 
-## Installation
-
-1. Add as a submodule of your dotfiles repository:
-
-    ```bash
-    git submodule add https://github.com/fcatuhe/dotbot-age.git
-    ```
-
-2. Copy the `edit-secrets` script to your dotfiles root:
-
-    ```bash
-    cp dotbot-age/tools/edit-secrets .
-    ```
-
 ## Setup
 
-### 1. Generate an age identity
-
-```bash
-mkdir -p encrypted
-age-keygen -o encrypted/age.key
-```
-
-### 2. Gitignore private files
+### 1. Gitignore private files
 
 Add to your `.gitignore`:
 
@@ -57,24 +36,26 @@ encrypted/age.key
 private/
 ```
 
-### 3. Create your secrets file
+### 2. Add the plugin as a submodule
 
 ```bash
-./edit-secrets
+git submodule add https://github.com/fcatuhe/dotbot-age.git
 ```
 
-This opens your `$EDITOR` with a `KEY=VALUE` file. Add your secrets:
+### 3. Copy the edit-secrets script
 
-```env
-SSH_SERVER_IP=192.168.1.100
-SSH_SERVER_USER=admin
-AWS_ACCOUNT_ID=123456789
-API_KEY=sk-secret-key
+```bash
+cp dotbot-age/tools/edit-secrets .
 ```
 
-On save, the file is encrypted to `encrypted/secrets.env.age`.
+### 4. Generate an age identity
 
-### 4. Create templates
+```bash
+mkdir -p encrypted
+age-keygen -o encrypted/age.key
+```
+
+### 5. Create templates
 
 Create template files in subdirectories of `encrypted/` using `{{PLACEHOLDER}}` syntax:
 
@@ -97,7 +78,24 @@ Host myserver
   IdentityFile ~/.ssh/id_ed25519
 ```
 
-### 5. Configure dotbot
+### 6. Create your secrets file
+
+```bash
+./edit-secrets
+```
+
+This opens your `$EDITOR` with a `KEY=VALUE` file. Add your secrets:
+
+```env
+SSH_SERVER_IP=192.168.1.100
+SSH_SERVER_USER=admin
+AWS_ACCOUNT_ID=123456789
+API_KEY=sk-secret-key
+```
+
+On save, the file is encrypted to `encrypted/secrets.env.age` and `./install` runs automatically to render templates into `private/`.
+
+### 7. Configure dotbot
 
 In your `install.conf.yaml`:
 
@@ -149,7 +147,7 @@ cp /secure/location/age.key encrypted/age.key
 
 ```bash
 ./edit-secrets
-./install
+# install runs automatically after re-encryption
 ```
 
 ### Add a new template
