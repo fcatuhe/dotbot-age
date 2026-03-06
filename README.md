@@ -93,7 +93,7 @@ AWS_ACCOUNT_ID=123456789
 API_KEY=sk-secret-key
 ```
 
-On save, the file is encrypted to `encrypted/secrets.env.age` and `./install` runs automatically to render templates into `private/`.
+On save, the file is encrypted to `encrypted/secrets.env.age` and templates are automatically re-rendered into `private/`.
 
 ### 7. Configure dotbot
 
@@ -131,6 +131,14 @@ All conventions can be overridden:
     private: path/to/output/
 ```
 
+## How it works
+
+Dotbot symlinks (e.g. `~/.ssh/config`) point to files in `private/`. These files are rendered from templates in `encrypted/` by substituting `{{PLACEHOLDERS}}` with values from the encrypted secrets file.
+
+When you run `./edit-secrets`, the script re-encrypts your changes and immediately re-renders the templates into `private/`. Since the symlinks already point there, your tools pick up the new values right away — no need to re-run `./install`.
+
+`./install` is only needed when you add new symlinks or set up a new machine.
+
 ## Workflow
 
 ### New machine
@@ -147,8 +155,9 @@ cp /secure/location/age.key encrypted/age.key
 
 ```bash
 ./edit-secrets
-# install runs automatically after re-encryption
 ```
+
+That's it — templates are re-rendered automatically. No need to run `./install`.
 
 ### Add a new template
 
