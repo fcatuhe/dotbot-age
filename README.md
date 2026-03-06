@@ -13,6 +13,14 @@ Dotfiles repos often need secrets — SSH configs, API keys, AWS credentials. Yo
 - Supports `--dry-run`
 - Is idempotent (skips unchanged files)
 
+## How it works
+
+Dotbot symlinks (e.g. `~/.ssh/config`) point to files in `private/`. These files are rendered from templates in `encrypted/` by substituting `{{PLACEHOLDERS}}` with values from the encrypted secrets file.
+
+When you run `./edit-secrets`, the script re-encrypts your changes and immediately re-renders the templates into `private/`. Since the symlinks already point there, your tools pick up the new values right away — no need to re-run `./install`.
+
+`./install` is only needed when you add new symlinks or set up a new machine.
+
 ## Prerequisites
 
 Install [age](https://github.com/FiloSottile/age):
@@ -130,14 +138,6 @@ All conventions can be overridden:
     encrypted: path/to/templates/
     private: path/to/output/
 ```
-
-## How it works
-
-Dotbot symlinks (e.g. `~/.ssh/config`) point to files in `private/`. These files are rendered from templates in `encrypted/` by substituting `{{PLACEHOLDERS}}` with values from the encrypted secrets file.
-
-When you run `./edit-secrets`, the script re-encrypts your changes and immediately re-renders the templates into `private/`. Since the symlinks already point there, your tools pick up the new values right away — no need to re-run `./install`.
-
-`./install` is only needed when you add new symlinks or set up a new machine.
 
 ## Workflow
 
