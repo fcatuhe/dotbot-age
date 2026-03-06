@@ -27,23 +27,17 @@ apt install age  # or see https://github.com/FiloSottile/age#installation
 
 ## Installation
 
-Add as a submodule of your dotfiles repository:
+1. Add as a submodule of your dotfiles repository:
 
-```bash
-git submodule add https://github.com/YOUR_USER/dotbot-age.git
-```
+    ```bash
+    git submodule add https://github.com/fcatuhe/dotbot-age.git
+    ```
 
-Copy the `edit-secrets` script to your dotfiles root:
+2. Copy the `edit-secrets` script to your dotfiles root:
 
-```bash
-cp dotbot-age/tools/edit-secrets .
-```
-
-Enable the plugin in your `install` script by adding `--plugin-dir dotbot-age`:
-
-```bash
-"${BASEDIR}/${DOTBOT_DIR}/${DOTBOT_BIN}" -d "${BASEDIR}" --plugin-dir dotbot-age -c "${CONFIG}" "${@}"
-```
+    ```bash
+    cp dotbot-age/tools/edit-secrets .
+    ```
 
 ## Setup
 
@@ -108,16 +102,19 @@ Host myserver
 In your `install.conf.yaml`:
 
 ```yaml
-- decrypt:
+- plugins:
+    - dotbot-age
+
+- decrypt: true
 
 - link:
     ~/.ssh/config: private/ssh/config
     ~/.aws/config: private/aws/config
 ```
 
-That's it — zero configuration needed if you follow the conventions.
-
 ## Convention
+
+The plugin works with zero configuration if you follow these conventions:
 
 | Path | Purpose |
 | --- | --- |
@@ -125,8 +122,6 @@ That's it — zero configuration needed if you follow the conventions.
 | `encrypted/secrets.env.age` | Encrypted `KEY=VALUE` secrets (committed) |
 | `encrypted/*/` | Template files with `{{PLACEHOLDERS}}` |
 | `private/` | Rendered output (gitignored, created by plugin) |
-
-## Configuration
 
 All conventions can be overridden:
 
