@@ -27,19 +27,19 @@ apt install age  # or see https://github.com/FiloSottile/age#installation
 
 ## Setup
 
-### 1. Gitignore private files
+### 1. Add the plugin as a submodule
+
+```bash
+git submodule add https://github.com/fcatuhe/dotbot-age.git
+```
+
+### 2. Gitignore private files
 
 Add to your `.gitignore`:
 
 ```
 encrypted/age.key
 private/
-```
-
-### 2. Add the plugin as a submodule
-
-```bash
-git submodule add https://github.com/fcatuhe/dotbot-age.git
 ```
 
 ### 3. Copy the edit-secrets script
